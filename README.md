@@ -31,7 +31,5 @@ func main() {
 	if point == newPoint {
 		fmt.Println("Point returned equal from PostGIS!")
 	}
-
-	fmt.Println(newPoint.SRID)
 }
 ```
