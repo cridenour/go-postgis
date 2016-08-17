@@ -18,13 +18,17 @@ func writeEWKB(g Geometry) (*bytes.Buffer, error) {
 		return nil, err
 	}
 
+	//Set type
 	if err := binary.Write(buffer, binary.LittleEndian, g.GetType()); err != nil {
 		return nil, err
 	}
 
+	//SRID
+	if err := binary.Write(buffer, binary.LittleEndian, uint32(4326)); err != nil {
+		return nil, err
+	}
 	if err := g.Write(buffer); err != nil {
 		return nil, err
 	}
-
 	return buffer, nil
 }
