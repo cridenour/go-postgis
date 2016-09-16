@@ -57,8 +57,8 @@ func (p *Point) Scan(value interface{}) error {
 	return nil
 }
 
-func (p *Point) Value() (driver.Value, error) {
-	buffer, err := writeEWKB(p)
+func (p Point) Value() (driver.Value, error) {
+	buffer, err := writeEWKB(&p)
 	if err != nil {
 		return nil, err
 	}
@@ -66,13 +66,13 @@ func (p *Point) Value() (driver.Value, error) {
 	return buffer.Bytes(), nil
 }
 
-func (p *Point) Write(buffer *bytes.Buffer) error {
-	err := binary.Write(buffer, binary.LittleEndian, p)
+func (p Point) Write(buffer *bytes.Buffer) error {
+	err := binary.Write(buffer, binary.LittleEndian, &p)
 	return err
 }
 
-func (p *Point) GetType() uint32 {
-	return GeomPoint
+func (p Point) GetType() uint32 {
+	return 1
 }
 
 /** PointZ functions **/

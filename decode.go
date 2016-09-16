@@ -22,14 +22,14 @@ func decode(value interface{}) (io.Reader, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return bytes.NewReader(ewkb), nil
 }
 
-func readEWKB(reader io.Reader, g interface{}) error {
+func readEWKB(reader io.Reader, g Geometry) error {
 	var byteOrder binary.ByteOrder
 	var wkbByteOrder byte
 	var wkbType uint32
-	var srid uint32
 
 	// Read as Little Endian to attempt to determine byte order
 	if err := binary.Read(reader, binary.LittleEndian, &wkbByteOrder); err != nil {
@@ -46,62 +46,11 @@ func readEWKB(reader io.Reader, g interface{}) error {
 		return errors.New("Unsupported byte order")
 	}
 
-	// Determine the geometry type
+	// Determine the geometery type
 	if err := binary.Read(reader, byteOrder, &wkbType); err != nil {
 		return err
 	}
-	//Determine the srid
-	if err := binary.Read(reader, byteOrder, &srid); err != nil {
-		return err
-	}
-	//diffence geometry type
-	switch wkbType {
-	case GeomPoint:
-		// Decode into point struct
-		return binary.Read(reader, byteOrder, g)
 
-	case GeomLineString:
-		//Detemine the point count
-		var count uint32
-		if err := binary.Read(reader, byteOrder, &count); err != nil {
-			return err
-		}
-
-		// Decode into linestring struct
-		g, ok := g.(*LineString)
-		if !ok {
-			return errors.New("geometry type should be LineString")
-		}
-		g.Points = make([]Point, count)
-		if err := binary.Read(reader, byteOrder, g.Points); err != nil {
-			return err
-		}
-
-		return nil
-	case GeomPolygon:
-		//Detemine the LinearRing count of the polygon
-		var rings uint32
-		if err := binary.Read(reader, byteOrder, &rings); err != nil {
-			return err
-		}
-		//Detemine the count of the polygon
-		var count uint32
-		if err := binary.Read(reader, byteOrder, &count); err != nil {
-			return err
-		}
-		g, ok := g.(*Polygon)
-		if !ok {
-			return errors.New("geometry type should be Polygon")
-		}
-
-		// Decode into Polygon struct
-		g.Points = make([]Point, count)
-		if err := binary.Read(reader, byteOrder, g.Points); err != nil {
-			return err
-		}
-
-		return nil
-	default:
-		return errors.New("Unsupported Geomtry type")
-	}
+	// Decode into our struct
+	return binary.Read(reader, byteOrder, g)
 }
