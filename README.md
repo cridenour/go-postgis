@@ -19,7 +19,11 @@ import (
 func main() {
 	db, _ := sql.Open("postgres", "database=pqgotest sslmode=disable")
 
-	point := postgis.PointS{4326, -84.5014, 39.1064}
+	point := postgis.PointS{
+		SRID: 4326,
+		X:    -84.5014,
+		Y:    39.1064,
+	}
 	var newPoint postgis.PointS
 
 	// Ensure we have PostGIS on the table
